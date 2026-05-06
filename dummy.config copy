@@ -1,0 +1,79 @@
+import { defineConfig, devices } from '@playwright/test';
+
+
+
+let testsToMatch = ['/.*\.e2e\.js/', ''];
+
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+defineConfig({
+  expect : {
+    timeout : 50000,
+    toHaveScreenshot : {
+      animations : "disabled",
+      caret : 'hide', // "initial",
+      maxDiffPixelRatio : 0.1,
+      maxDiffPixels : 10,
+      pathTemplate : "", //check  testConfig.snapshotPathTemplate 
+      scale  : "device",
+      stylePath : "", // string | string[]
+      threshold : 0.2
+    },
+    toMatchAriaSnapshot : {
+      pathTemplate : "" //check  testConfig.snapshotPathTemplate
+    },
+    toMatchSnapshot : {
+      maxDiffPixelRatio : 0.1,
+      maxDiffPixels : 10,
+      threshold : 0.2,
+    },
+    toPass : {
+      intervals : [1,2,3], // number[] // Default retry intervals (in milliseconds)
+      timeout : 20000 // Default timeout for all expect.toPass() calls (in milliseconds)
+    }
+  },
+  build : {
+    external : ['', ''] // Paths to exclude from the transpilation expressed as a list of glob patterns. Typically heavy JS bundles that your test uses are listed here.
+  },
+  grep: /smoke/,
+  grepInvert :  /manual/,
+  testMatch :  testsToMatch,
+  testIgnore : ['**\/test-assets/**', ''],
+  testDir : './tests/playwright',
+  outputDir: './test-results',
+  forbidOnly: !!process.env.CI,
+  failOnFlakyTests: !!process.env.CI,
+  fullyParallel : false,
+  globalSetup: '@global/global-setup', // Legacy Aproach
+  globalTeardown: '@global/global-teardown', // Legacy Aproach
+  globalTimeout: process.env.CI ? 60 * 60 * 1000 : 60* 1 * 1000,
+  use : {
+
+  },
+  maxFailures : 20,
+  metadata: { title: 'acceptance tests' },
+  name: 'acceptance tests',
+  retries : 2,
+  repeatEach : 0,
+  preserveOutput: "failures-only",
+  ignoreSnapshots : false,
+  reportSlowTests : null,
+  quiet: !!process.env.CI,
+  reporter : [["blob"], ['list']],
+  respectGitIgnore : true,
+  shard : {current : 5, total : 2},
+  //snapshotDir : '', @Deprecated
+  snapshotPathTemplate : '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
+  
+
+})
